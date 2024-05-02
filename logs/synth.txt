@@ -1,0 +1,171 @@
+@2024-04-24
+@15:52 What did I do yesterday?
+Just getting some context.
+
+@15:53 Okay next steps
+It looks like I got the initial buffer set up to
+write and parse msgpack queries. The next thing I'll
+need to do is to make a series of msgpack queries
+to simulate making a synth. Say, computing a sine tone
+and writing it to a wav file. When that's done, it can
+be hooked up to a actual sndkit logic.
+
+@15:55 Refactor hello example
+Move stuff out of main, more programs will happen.
+
+@15:57 msgpack_sine() boilerplate
+This function is named because only the msgpack messages
+are the main concern here. The sndkit will be hooked
+up later.
+
+This mainly builds off the hello buffer example, so I am
+building off of that now.
+
+@16:04 Handle consants like #123.45
+I'm thinking about constants. To keep things simple,
+I'm making it so that a msgpack string is evaluated
+like a forth word with a lookup table. But how to
+handle constant parameter vals? I'm thinking they
+can use start with "#" so they can be represented
+as strings as well. Works well for Konilo because floats
+don't really exist anyways. I believe it would work as
+'#123.45
+
+@16:06 Does '#123.45 work as expected in Konilo?
+yes, it seems to work out alright
+
+@16:09 actually, '#' not needed
+it's funny. this was a sporth thing too. I started
+with a sigil there too, but I realized that I could
+make it so any word starting with a number would be a
+parameter value, and things started looking a lot better.
+
+@16:11 Adding placeholder parser
+Now that the synth is making the messages, those objects
+need to be passed to something, not just printed to
+the screen. This will be a parser, that will read
+an object generated from msgpack. The goal now is to make
+sure constants, words, and objects get routed to the
+right places. This will turn into glue code for the sndkit
+API.
+
+@16:21 TODO Need to add type checks for parser
+The boilerplate object parser is hooked up to the small
+example. Now I just need to do flesh out some of the
+object stuff. There's no public way to tell what the
+object type is, so I'll need to add in some code for
+that before continuing. I'm out of time, so tomorrow then.
+
+@17:56 Back at it. Implementing type checkers/getters.
+Turns out I have a bit of time to push onwards. 
+
+@18:31 Generating a TODO script
+Can't resist. I'm dropping a bunch of TODOs in this
+file, and I want to follow up on them eventually.
+Going to whip up a quick shell script that looks for
+TODO lines and prints them with their filename and
+line number.
+
+@18:56 well, that look longer than expected
+TODO.sh works though. sigh. tool-mind.
+
+@2024-04-25
+@14:44 time to bring in sndkit?
+I think I can import the sndkit stuff. The node lookup
+stuff will need to be re-written eventually, but this
+should be enough for a proof of concept.
+
+@14:45 Oh, right, samurai...
+mnolth is all samurai, generated via lua. Gonna have
+to port some of the mnolth build system. Eventually,
+I'd like to set things up so that Makefiles can be
+generated from the same lua code as well.
+
+@14:58 everything + sndkit builds with samurai, now computes
+Need "computes" command working. Probably will just make
+it a word for now. In the future, it might be possible
+to make this an object. Will need to change the language
+in my code to reflect that words can be things other
+than nodes...
+
+@15:02 Have to stop actually, package arrived
+This is actually a good stopping point. A package has
+arrived and it's perfect timing. Until next time...
+
+@19:09 Implement computes as command, not word
+Looking at how I implemented it, it makes more sense
+to make it a command type, because the duration
+in passed in directly as an arg not using the sndkit
+stack. A bit more work now.
+
+@19:19 node vs cmd
+right now it feels silly, in the implementation the key
+'node' means node lookup, while 'cmd' means it's a command.
+The code logic is virtually the same at the moment. I think
+I'm going to keep this because eventually I might
+want to use keys for different kinds of namespaces
+(gestvm vs uxn vs sndkit, etc).
+
+@19:21 squashing in the sndkit API
+Now I think there's enough in place where it makes sense
+to add in the sndkit API bits.
+
+@19:43 Looks like a sine wave
+I don't have my speakers hooked up, but I plotted the
+wavform, and it looks like I generated a sine wave.
+
+@19:44 Up next: get this working in Konilo
+The program we want will look like this in Konilo:
+'440 c '0.5 c sine 'test.wav wavout '10 computes
+
+If I can get a custom sigil working in Konilo, something
+like this:
+
+=440 =0.5 sine 'test.wav wavout =10 computes
+
+@2024-04-26 Ilo/konilo integration
+
+@14:23 import in ilo VM
+The core ilo VM is going to be imported now. I'll need
+to slowly add modifications to get the IO working.
+
+@14:33 Initial custom IO hooks
+I need to make sure I can add IO stuff in the C code,
+and execute konilo code that will call it. Since I'm not
+used to the block editor, I am going to need to import
+the tools I wrote earlier that allow me to extract/insert
+blocks.
+
+@14:52 Insert block utility doesn't work?
+When I try to run it, it seems to break Konilo.
+
+@15:01 Had to open it in "r+" mode to prevent clobbering
+
+@15:22 placeholder IO works in Konilo
+I have some initial abstractions that can be used
+to begin/end a buffer and put bytes. These now need
+to get connected to the buffer objects now.
+
+@15:23 TODO: connect buffer/sndkit, add "hello" command
+I need to set up the working buffer/sndkit stuff, and also
+make sure there's enough konilo code where I can encode
+a word in msgpack trivially. something like "orph:word".
+It would be great for something like 'hello orph:word to
+work.
+
+@18:50 Adding "hello" command for testing
+
+@18:56 Implementing orph:word
+
+@19:09 Introducing sndkit + buffer into ilo vm
+
+@19:20 Adding wavout object
+
+@19:43 Proof of concept works, I think, next steps?
+Wow, I think it all works now. Not sure where to go from
+here. More nodes needed (obvs), real-time and hotswapping,
+and this eventually needs to get thrown into a repo. And,
+I need to establish a way to set up ilo a bit better.
+
+@19:58 I want a banner and I want cowsay
+I am wasting time now.

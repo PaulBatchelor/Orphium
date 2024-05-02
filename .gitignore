@@ -1,0 +1,5 @@
+*.o
+ilo.blocks
+ilo.rom
+Makefile
+build.ninja

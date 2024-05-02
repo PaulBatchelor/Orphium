@@ -1,0 +1,16 @@
+(orphium) (orph:)
+
+:c orph:word ;
+:sine 'sine orph:word ;
+:wavout 'data 'wavout 'node orph:obj ;
+:computes 'data 'computes 'cmd orph:obj ;
+:hello-sine '440 c '0.5 c sine 'out2.wav wavout '10 computes ;
+
+
+
+
+
+
+
+
+

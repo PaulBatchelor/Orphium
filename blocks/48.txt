@@ -1,0 +1,16 @@
+(orphium) (orph:)
+
+:orph:io #8 io ;
+:orph:begin #0 orph:io ;
+:orph:put #1 orph:io ;
+:orph:end #2 orph:io ;
+:orph:str 
+dup a:length #5 #5 shift-left or orph:put
+[ orph:put ] s:for-each ;
+:orph:word orph:begin orph:str orph:end ;
+:orph:fixmap #8 #4 shift-left or orph:put ;
+:orph:obj
+orph:begin #2 orph:fixmap orph:str orph:str
+orph:str orph:str orph:end ;
+
+

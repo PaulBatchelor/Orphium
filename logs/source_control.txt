@@ -1,0 +1,10 @@
+@2024-05-01 Initial Source Control Pre-Setup
+@19:27 Move things to "lib" folder
+@19:31 Fallback Makefile generator
+@20:09 How to best compress ilo blocks
+probably zip files. Not going to worry about including
+this in the system for now.
+@20:17 TODO.sh is slow to the point of being unresponsive
+not sure what that is about. wait nevermind. silver searcher
+is just *that* much faster than grep.
+@20:20 Setting up initial git repo

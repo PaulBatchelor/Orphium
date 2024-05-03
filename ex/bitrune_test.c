@@ -36,9 +36,13 @@ int main(int argc, char *argv[])
 
     bitrune_clear(&rune);
     runepos = 0;
-    while(!bitrune_extract(&pg, &rune)) {
+
+    while (!bitrune_extract(&pg, &rune)) {
+        int x, y, w, h;
         printf("rune: %d\n", runepos);
-        bitrune_print(&rune);
+        bitrune_bounds(&rune, &x, &y, &w, &h);
+        printf("bounds: %d %d %d %d\n", x, y, w, h);
+        bitrune_print_bounds(&rune, x, y, w, h);
         bitrune_clear(&rune);
         runepos++;
     }

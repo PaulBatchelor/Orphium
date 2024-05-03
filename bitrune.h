@@ -25,6 +25,10 @@ int bitrune_extract(bitrune_page *page, bitrune_page *rune);
 
 /* determine the bounding box of a rune or page */
 void bitrune_bounds(bitrune_page *rune,
-    int *x, int *y,
-    int *w, int *h);
+                    int *x, int *y,
+                    int *w, int *h);
+
+void bitrune_print_bounds(bitrune_page *rune,
+                          int xoff, int yoff,
+                          int w, int h);
 #endif

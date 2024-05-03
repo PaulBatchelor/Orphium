@@ -22,9 +22,9 @@ void bitrune_print(bitrune_page *page)
             s = (row & (1<<x)) >> x;
 
             if (s) {
-                rowstr[x] = '1';
+                rowstr[x] = '#';
             } else {
-                rowstr[x] = '0';
+                rowstr[x] = '.';
             }
         }
 
@@ -143,5 +143,50 @@ void bitrune_bounds(bitrune_page *rune,
     int *x, int *y,
     int *w, int *h)
 {
+    int min_x, max_x;
+    int min_y, max_y;
 
+    int xp, yp;
+
+    /* initialize variables */
+    *x = *y = *w = *h = -1;
+    min_x = min_y = 100;
+    max_x = max_y = -1;
+
+    for (yp = 0; yp < 16; yp++) {
+        for (xp = 0; xp < 16; xp++) {
+            if (bitrune_get(rune, xp, yp)) {
+                if (xp < min_x) min_x = xp;
+                if (yp < min_y) min_y = yp;
+                if (xp > max_x) max_x = xp;
+                if (yp > max_y) max_y = yp;
+            }
+        }
+    }
+
+    *x = min_x;
+    *y = min_y;
+    *w = (max_x - min_x) + 1; 
+    *h = (max_y - min_y) + 1;
+}
+
+void bitrune_print_bounds(bitrune_page *rune,
+                          int xoff, int yoff,
+                          int w, int h)
+{
+    int x, y;
+
+    for (y = 0; y < h; y++) {
+        char rowstr[18];
+        for (x = 0; x < w; x++) {
+            if (bitrune_get(rune, x + xoff, y + yoff)) {
+                rowstr[x] = '#';
+            } else {
+                rowstr[x] = '.';
+            }
+        }
+        rowstr[w] = '\n';
+        rowstr[w+1] = 0;
+        printf("%s", rowstr);
+    }
 }

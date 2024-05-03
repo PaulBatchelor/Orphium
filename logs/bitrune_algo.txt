@@ -10,3 +10,8 @@ The first files here are just going to be a proof of
 concept, with a file for the bitrune algorithm, and
 an a small example in the test folder.
 @11:43 Set up initial function prototypes
+@12:02 initial page print
+@12:09 set function
+@12:13 extract
+@12:35 initial debugging
+@12:47 things work! TODO: bounds checking, better printing

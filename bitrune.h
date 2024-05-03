@@ -16,6 +16,9 @@ void bitrune_print(bitrune_page *page);
 /* set a bitrune tile, given an X/Y location */
 void bitrune_set(bitrune_page *page, int x, int y, int s);
 
+/* get a bitrune tile, given an X/Y location */
+int bitrune_get(bitrune_page *page, int x, int y);
+
 /* extract the top-left most bitrune from page to rune */
 /* returns non-zero if no bitrune found */
 int bitrune_extract(bitrune_page *page, bitrune_page *rune);

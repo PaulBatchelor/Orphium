@@ -1,25 +1,6 @@
 config = {}
 
 for _,a in pairs(arg) do
-    -- if (a == "live") then
-    --     config.mnort = true
-    -- elseif (a == "mnodes") then
-    --     config.mnodes = true
-    -- elseif (a == "monome") then
-    --     config.monome = true
-    -- elseif (a == "x264") then
-    --     config.x264 = true
-    -- elseif (a == "clang") then
-    --     config.clang = true
-    -- elseif (a == "light") then
-    --     config.light = true
-    -- elseif (a == "all") then
-    --     config.monome = true
-    --     config.mnodes = true
-    --     config.mnort = true
-    --     config.x264 = true
-    --     config.light = true
-    -- end
 end
 
 
@@ -42,7 +23,15 @@ build = {}
 
 objects = {}
 
+-- these don't have main
+extra_objects = {}
+
 tangled = {}
+
+cc="gcc"
+
+-- generated programs
+programs = {}
 
 cflags = {"-Wall", "-pedantic", "-O3", "-g"}
 
@@ -52,6 +41,7 @@ function insert_object(obj)
         mkbuild(obj_o,
             "c89",
             obj .. ".c"))
+    table.insert(extra_objects, obj_o)
 end
 
 function insert_objects(t)
@@ -125,7 +115,6 @@ function add_tangled_objects(obj)
     end
 end
 
-cc="gcc"
 table.insert(rules,
     mkrule("worgle", "util/worgle/worglite -Werror -g $in"))
 table.insert(rules,
@@ -316,7 +305,22 @@ function generate_makefile()
             )
     end
 
-    fp:write("clean:\n\t $(RM) -rf " .. objstr .. " liborphium.a")
+    fp:write("clean:\n")
+    fp:write("\t $(RM) -rf " .. objstr .. " liborphium.a\n")
+    -- remove programs and extra objects
+    
+    local progstr = ""
+    local extraobjstr = ""
+
+    if #programs > 0 then
+        progrstr = table.concat(programs, " ")
+    end
+
+    if #extra_objects > 0 then
+        extra_objects = table.concat(programs, " ")
+    end
+    fp:write("\t $(RM) -rf " .. progstr .. " liborphium.a\n")
+    fp:write("\t $(RM) -rf " .. extraobjstr .. " liborphium.a\n")
 
     fp:close()
 end
@@ -330,6 +334,7 @@ function insert_program(name, objs)
     end
     table.insert(build,
         mkbuild(name, "link", objstr .. " liborphium.a"))
+    table.insert(programs, name)
 end
 
 
@@ -340,6 +345,7 @@ add_objects {
     "buffer",
     "parse",
     "ilo",
+    "bitrune",
 }
 
 -- this has main, so make a build rule but don't add
@@ -349,12 +355,14 @@ insert_objects {
     "tools/insert_block",
     "main",
     "ex/hello",
+    "ex/bitrune_test",
 }
 
 insert_program("orphium", "main")
 insert_program("tools/extract_block", "tools/extract_block")
 insert_program("tools/insert_block", "tools/insert_block")
 insert_program("ex/hello", "ex/hello")
+insert_program("ex/bitrune_test", "ex/bitrune_test")
 
 require("lib/sndkit/config")
 

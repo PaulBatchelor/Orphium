@@ -1,0 +1,11 @@
+@2024-05-03
+@11:32 initial file creation
+Finally getting around to implementing this algorithm
+I've had rattling around in my head for about a year.
+I'm implementing this now because I want to make sure
+I get grid support working, and this algorithm is a
+primary part of the input method.
+
+The first files here are just going to be a proof of
+concept, with a file for the bitrune algorithm, and
+an a small example in the test folder.

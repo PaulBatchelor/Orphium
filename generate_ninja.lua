@@ -346,6 +346,7 @@ add_objects {
     "parse",
     "ilo",
     "bitrune",
+    "lib/z85/z85",
 }
 
 -- this has main, so make a build rule but don't add

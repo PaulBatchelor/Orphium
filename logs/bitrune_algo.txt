@@ -25,3 +25,26 @@ Instead, I will need to find the min/max XY positions of tiles.
 @19:24 print bounds
 @19:32 debugging print bounds
 @19:35 tweaks
+@19:41 And we're done. What now?
+Everything is now merged and pushed. What's implemented
+are the initial primitives needed to make a bitrune parser
+work. The parser could take input (presumably made on
+a grid), and yield an array of bitrunes. There is no
+way yet to turn those bitrunes into meaningful tokens
+or words. There also is no interactive grid system yet.
+@19:46 Create variable autonamer
+a way to convert runes into variable names.
+@20:06 massaging Z85 implementation
+I'm using ANSI C compiler flags, so I have to tweak
+a few things in their implementation.
+@20:19 z85 only takes arrays bounded to 4-bytes
+@20:28 remove potentially problematic characters
+Since this only needs to be a one-way encoding, replace
+characters that you wouldn't typically find in variable
+names with more standard alphanumeric doubles. This
+will require doing a first pass to properly calculate
+a string size, then a second pass to encode to a newly
+allocated string.
+@20:35 TODO escape character encoding
+I decided I've done enough today. Will think about it
+another day.

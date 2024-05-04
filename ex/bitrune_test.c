@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "bitrune.h"
 
 int main(int argc, char *argv[])
@@ -39,10 +40,14 @@ int main(int argc, char *argv[])
 
     while (!bitrune_extract(&pg, &rune)) {
         int x, y, w, h;
+        char *varname;
         printf("rune: %d\n", runepos);
         bitrune_bounds(&rune, &x, &y, &w, &h);
         printf("bounds: %d %d %d %d\n", x, y, w, h);
         bitrune_print_bounds(&rune, x, y, w, h);
+        varname = bitrune_autoname(&rune, x, y, w, h);
+        printf("varname: %s\n", varname);
+        free(varname);
         bitrune_clear(&rune);
         runepos++;
     }

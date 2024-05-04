@@ -1,5 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "bitrune.h"
+
+typedef unsigned char byte;
+char * Z85_encode (byte *data, size_t size);
 
 void bitrune_clear(bitrune_page *page)
 {
@@ -189,4 +194,73 @@ void bitrune_print_bounds(bitrune_page *rune,
         rowstr[w+1] = 0;
         printf("%s", rowstr);
     }
+}
+
+char* bitrune_autoname(bitrune_page *rune,
+                       int xoff, int yoff,
+                       int w, int h)
+{
+    byte *bits;
+    char *z85str;
+    int nbytes;
+    int nbits;
+    int x, y;
+    int bitpos;
+    char *varname;
+
+    /* determine number of bytes required for bitstream */
+
+    nbits = w * h;
+    nbytes = 0;
+
+    /* there's probably a more efficient way to do this */
+    while ((nbytes * 8) < nbits) nbytes++;
+
+    /* z85 only takes bytes bounded to 4 bytes */
+    while ((nbytes % 4) != 0) nbytes++;
+
+    /* allocate and zero out */
+
+    bits = malloc(nbytes);
+
+    for (x = 0; x < nbytes; x++) bits[x] = 0;
+
+    /* iterate through bitmap, copy bits to bitstream */
+
+    bitpos = 0;
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+            int which_byte;
+            int which_bit;
+            int s, b;
+
+            which_bit = bitpos % 8;
+            which_byte = bitpos / 8;
+            s = bitrune_get(rune, x + xoff, y + yoff);
+            b = bits[which_byte];
+
+            if (s) {
+                b |= 1 << which_bit; 
+            } else {
+                b &= ~(1 << which_bit);
+            }
+
+            bits[which_byte] = b;
+
+            bitpos++;
+        }
+    }
+
+    z85str = Z85_encode(bits, nbytes);
+    varname = malloc(2 + strlen(z85str));
+    free(bits);
+    varname[0] = 'B';
+    varname[1] = 'R';
+    /* really quick and dirty copy */
+    for (x = 0; x < strlen(z85str); x++) {
+        varname[x + 2] = z85str[x];
+    }
+    free(z85str);
+    /* encode to z85 */
+    return varname;
 }

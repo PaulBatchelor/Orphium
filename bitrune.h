@@ -31,4 +31,8 @@ void bitrune_bounds(bitrune_page *rune,
 void bitrune_print_bounds(bitrune_page *rune,
                           int xoff, int yoff,
                           int w, int h);
+
+char* bitrune_autoname(bitrune_page *rune,
+                       int xoff, int yoff,
+                       int w, int h);
 #endif

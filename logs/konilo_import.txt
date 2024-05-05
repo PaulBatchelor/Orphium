@@ -1,3 +1,7 @@
 2024-05-04
 @19:22 Initial scoping... what am I going to do here?
 @19:23 Import konilo tools
+@19:43 fixing errors related to c89 compat
+@19:57 get generate-dictionary to work
+@20:07 Losing focus. Signing off
+I keep getting distracted. No point in staying here.

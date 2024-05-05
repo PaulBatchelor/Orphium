@@ -33,6 +33,9 @@ cc="gcc"
 -- generated programs
 programs = {}
 
+-- phony targets
+phony_targets = {}
+
 cflags = {"-Wall", "-pedantic", "-O3", "-g"}
 
 function insert_object(obj)
@@ -219,6 +222,13 @@ function generate_ninja()
         end
     end
 
+    -- phony targets
+    for name,deps in pairs(phony_targets) do
+        fp:write("build " ..
+            name .. ": phony " ..
+            table.concat(deps, " ") .. "\n")
+    end
+
     fp:write("default orphium\n")
 
     fp:close()
@@ -319,6 +329,7 @@ function generate_makefile()
     if #extra_objects > 0 then
         extra_objects = table.concat(programs, " ")
     end
+
     fp:write("\t $(RM) -rf " .. progstr .. " liborphium.a\n")
     fp:write("\t $(RM) -rf " .. extraobjstr .. " liborphium.a\n")
 
@@ -327,6 +338,9 @@ end
 
 function insert_program(name, objs)
     objstr = ""
+    if objs == nil then
+        objs = name
+    end
     if type(objs) == "string" then
         objstr = objs .. ".o"
     else
@@ -335,6 +349,12 @@ function insert_program(name, objs)
     table.insert(build,
         mkbuild(name, "link", objstr .. " liborphium.a"))
     table.insert(programs, name)
+end
+
+function phony(name)
+    return function (t)
+        phony_targets[name] = t
+    end
 end
 
 
@@ -357,15 +377,35 @@ insert_objects {
     "main",
     "ex/hello",
     "ex/bitrune_test",
+    "tools/pali",
+    "tools/generate-dictionary",
+    "tools/retro-unu",
+    "tools/block-import",
+    "tools/block-export",
+}
+
+phony("tools") {
+    "tools/extract_block",
+    "tools/insert_block",
+    "tools/pali",
+    "tools/generate-dictionary",
+    "tools/retro-unu",
+    "tools/block-import",
+    "tools/block-export",
 }
 
 insert_program("orphium", "main")
-insert_program("tools/extract_block", "tools/extract_block")
-insert_program("tools/insert_block", "tools/insert_block")
-insert_program("ex/hello", "ex/hello")
-insert_program("ex/bitrune_test", "ex/bitrune_test")
+insert_program("tools/extract_block")
+insert_program("tools/insert_block")
+insert_program("ex/hello")
+insert_program("ex/bitrune_test")
+insert_program("tools/pali")
+insert_program("tools/generate-dictionary")
+insert_program("tools/retro-unu")
+insert_program("tools/block-import")
+insert_program("tools/block-export")
 
 require("lib/sndkit/config")
 
 generate_ninja()
-generate_makefile()
+-- generate_makefile()

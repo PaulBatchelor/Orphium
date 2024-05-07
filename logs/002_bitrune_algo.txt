@@ -48,3 +48,18 @@ allocated string.
 @20:35 TODO escape character encoding
 I decided I've done enough today. Will think about it
 another day.
+@2024-05-07
+@18:40 Auto-namer is a dead end, hashes?
+I'm doing a substition technique which is non-reversible,
+so I might as well be doing a hash basically.
+
+So, hashes.
+
+I'm optimistically assuming that hash collisons won't
+happen, so I'd like to keep the hash pretty short, so
+the variable name is short.
+
+Using 0-9A-Z can give over 5 bits of information. 5
+characters yields 5 bits of info. we can prepend with
+BR, and possible hex numbers for the width/height of
+the glyph in an attempt to prevent any collisions.

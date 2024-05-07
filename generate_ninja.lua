@@ -135,6 +135,9 @@ table.insert(rules,
 table.insert(rules,
     mkrule("ar", "ar rcs $out $in", "creating $out"))
 
+table.insert(rules,
+    mkrule("gendict", "./tools/generate-dictionary", "generating dictionary"))
+
 libs = {
     -- "-lm",
 
@@ -146,24 +149,7 @@ libs = {
     -- "-lreadline",
 }
 
--- if config.x264 == true then
---     table.insert(libs, "-lx264")
---     add_cflags{"-DMNOLTH_X264"}
--- end
-
 add_cflags({"-Ilib", "-I."})
-
--- if config.mnort then
---     add_cflags{"-DBUILD_MNORT"}
--- 
---     add_objects {
---       "util/mnort/server",
---       "util/mnort/client",
---       "util/mnort/rt",
---     }
--- 
---     table.insert(libs, "-ljack")
--- end
 
 function add_libs(p)
     for _,v in pairs(p) do
@@ -244,15 +230,6 @@ function generate_makefile()
 
     fp:write("default: orphium\n")
 
-    -- for _, v in pairs(rules) do
-    --     fp:write("rule " .. v.name .. "\n")
-    --     fp:write("    command = " .. v.command .. "\n")
-
-    --     if v.description ~= nil then
-    --         fp:write("    description = "
-    --             .. v.description.. "\n")
-    --     end
-    -- end
 
     function process_files(f)
         if type(f) == "string" then
@@ -404,6 +381,10 @@ insert_program("tools/generate-dictionary")
 insert_program("tools/retro-unu")
 insert_program("tools/block-import")
 insert_program("tools/block-export")
+
+-- generate dictionary
+table.insert(build,
+    mkbuild("forth.dictionary", "gendict", "dict.data", nil, "tools/generate-dictionary"))
 
 require("lib/sndkit/config")
 

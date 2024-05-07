@@ -143,6 +143,10 @@ table.insert(rules,
 table.insert(rules,
     mkrule("cat", "cat $in > $out"))
 
+-- generate blocks
+table.insert(rules,
+    mkrule("genblocks", "sh mkblocks.sh", "generating blocks"))
+
 libs = {
     -- "-lm",
 
@@ -394,6 +398,12 @@ table.insert(build,
 -- generate konilo.pali amalgamation
 table.insert(build,
     mkbuild("konilo.pali", "cat", {"forth.pali", "forth.dictionary"}))
+
+table.insert(build,
+    mkbuild("ilo.blocks",
+    "genblocks", "mkblocks.sh", nil,
+    {"mkblocks.sh", "tools/block-import", "tools/insert_block"}))
+
 require("lib/sndkit/config")
 
 generate_ninja()

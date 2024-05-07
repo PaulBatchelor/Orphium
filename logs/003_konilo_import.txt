@@ -13,3 +13,7 @@ in my build script generator that can produces that.
 Output: forth.dictionary
 Input: dict.data
 @18:55 Generate konilo.pali
+@19:04 Generate blocks
+This will be kind of ugly at the moment, since I'm not
+sure how yet how I want include all the blocks in source
+control.

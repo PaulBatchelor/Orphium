@@ -12,3 +12,4 @@ in my build script generator that can produces that.
 @18:44 Add generate-dictionary to build
 Output: forth.dictionary
 Input: dict.data
+@18:55 Generate konilo.pali

@@ -135,8 +135,13 @@ table.insert(rules,
 table.insert(rules,
     mkrule("ar", "ar rcs $out $in", "creating $out"))
 
+-- dictionary generator
 table.insert(rules,
     mkrule("gendict", "./tools/generate-dictionary", "generating dictionary"))
+
+-- concat files (for konilo.pali amalgamation)
+table.insert(rules,
+    mkrule("cat", "cat $in > $out"))
 
 libs = {
     -- "-lm",
@@ -386,6 +391,9 @@ insert_program("tools/block-export")
 table.insert(build,
     mkbuild("forth.dictionary", "gendict", "dict.data", nil, "tools/generate-dictionary"))
 
+-- generate konilo.pali amalgamation
+table.insert(build,
+    mkbuild("konilo.pali", "cat", {"forth.pali", "forth.dictionary"}))
 require("lib/sndkit/config")
 
 generate_ninja()

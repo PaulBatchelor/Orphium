@@ -5,3 +5,6 @@
 @19:57 get generate-dictionary to work
 @20:07 Losing focus. Signing off
 I keep getting distracted. No point in staying here.
+Generate-dictionary works, and it produces a file called
+forth.dictionary. I'm going to need to add a target
+in my build script generator that can produces that.

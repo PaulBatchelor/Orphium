@@ -228,7 +228,7 @@ function generate_ninja()
             table.concat(deps, " ") .. "\n")
     end
 
-    fp:write("default orphium\n")
+    fp:write("default orphium ilo.rom ilo.blocks\n")
 
     fp:close()
 end
@@ -411,7 +411,7 @@ table.insert(build,
 table.insert(build,
     mkbuild("ilo.rom",
     "genrom", {"mkrom.sh", "konilo.pali", "extend.konilo"}, nil,
-    {"mkrom.sh", "tools/pali", "tools/insert_block", "orphium"}))
+    {"mkrom.sh", "tools/pali", "tools/retro-unu", "ilo.blocks", "orphium"}))
 
 require("lib/sndkit/config")
 

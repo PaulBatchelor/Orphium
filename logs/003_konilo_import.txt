@@ -18,3 +18,4 @@ This will be kind of ugly at the moment, since I'm not
 sure how yet how I want include all the blocks in source
 control.
 @19:16 Generate ilo rom
+@19:20 Can it build on OSX?

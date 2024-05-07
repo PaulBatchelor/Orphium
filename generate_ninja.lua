@@ -147,6 +147,10 @@ table.insert(rules,
 table.insert(rules,
     mkrule("genblocks", "sh mkblocks.sh", "generating blocks"))
 
+-- generate ilo rom
+table.insert(rules,
+    mkrule("genrom", "sh mkrom.sh", "generating rom"))
+
 libs = {
     -- "-lm",
 
@@ -403,6 +407,11 @@ table.insert(build,
     mkbuild("ilo.blocks",
     "genblocks", "mkblocks.sh", nil,
     {"mkblocks.sh", "tools/block-import", "tools/insert_block"}))
+
+table.insert(build,
+    mkbuild("ilo.rom",
+    "genrom", {"mkrom.sh", "konilo.pali", "extend.konilo"}, nil,
+    {"mkrom.sh", "tools/pali", "tools/insert_block", "orphium"}))
 
 require("lib/sndkit/config")
 

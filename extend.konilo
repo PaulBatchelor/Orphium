@@ -1,0 +1,461 @@
+================================================================
+
+ ,dPYb,                                    ,dPYb,
+ IP'`Yb                                    IP'`Yb
+ I8  8I                               gg   I8  8I
+ I8  8bgg,                            ""   I8  8'
+ I8 dP" "8    ,ggggg,   ,ggg,,ggg,    gg   I8 dP    ,ggggg,
+ I8d8bggP"   dP"  "Y8  ,8" "8P" "8,   88   I8dP    dP"  "Y8
+ I8P' "Yb,  i8'    ,8I d8   8I   8I   88   I8P    i8'    ,8I
+,d8    `Yb,,d8,   ,d8P8P    8I   Yb,_,88,_,d8b,_ ,d8,   ,d8'
+88P      Y8P"Y8888P"        8I   `Y88P""Y88P'"Y88P"Y8888P"
+
+================================================================
+
+This file provides the high level extensions to the Konilo
+system.
+
+Stack comments are made by the `(` sigil. I define this first,
+as they are useful to have.
+
+~~~
+&sigil:( #40 sigil:set
+:) ;
+~~~
+
+Next is a `$` sigil, to return the character from a string. I'll
+use this to setup other sigils without needing to hard code the
+ASCII constants.
+
+~~~
+:sigil:$ #0 s:fetch process-data ;
+&sigil:$ #36 sigil:set
+~~~
+
+For accessing variables, the `@` (fetch) and `!` (store) sigils
+are defined.
+
+~~~
+:sigil:@
+  d:lookup d:address fetch
+  compiling? [ &internal:lit comma comma &fetch comma ]
+             &fetch choose ;
+
+:sigil:!
+  d:lookup d:address fetch
+  compiling? [ &internal:lit comma comma &store comma ]
+             &store choose ;
+
+&sigil:@ $@ sigil:set
+&sigil:! $! sigil:set
+~~~
+
+The last sigil is `\`, which creates a header pointing to an
+address. You can use this to name quotes:
+
+    [ ... ] \name
+
+or to make an alias:
+
+    &drop \sigil:(
+
+~~~
+:sigil:\ d:create @Dictionary d:address store ;
+&sigil:\ $\ sigil:set
+~~~
+
+I/O device 7 pushes the depth of the data and address stacks to
+the data stack. (Excluding the pushed values). I define words to
+access these should the need arise. (Mostly, I just use the
+`depth/data` to make sure the data stack has the right number
+of elements)
+
+~~~
+:depths        (-nn) #7 io ;       (data,_then_address_depth)
+:depth/data    (-n) depths drop ;
+:depth/address (-n) depths nip ;
+~~~
+
+Scope words. I've used these for over a decade now. It lets me
+hide factors from the main dictionary. This isn't realy crucial,
+just a quality of life helper.
+
+~~~
+:{{ @Dictionary dup &sys:buffers/scope store-next store ;
+:---reveal---
+  '_ d:create @Dictionary &sys:buffers/scope n:inc store ;
+:}} &sys:buffers/scope fetch-next swap fetch d:link store ;
+~~~
+
+Variables. Ones made without an initial value are set to zero.
+Use the & sigil when using them.
+
+~~~
+:var-n (ns-) d:create comma ;
+:var   (s-)  d:create #0 comma ;
+~~~
+
+~~~
+:rot (abc-bca) &swap dip swap ;
+:n:between? (nlu-f) rot [ rot rot n:limit ] sip eq? ;
+~~~
+
+The words in `compile:` are intended to help in writing compiler
+extensions for generating ilo code words. I use them to implement
+`curry`, which binds a value and function together into a new
+function.
+
+E.g.,
+
+    #678 &n:put curry \display:678
+
+~~~
+:compile:lit  (n-) #1 comma comma ;
+:compile:call (a-) compile:lit #8 comma ;
+:compile:jump (a-) compile:lit #7 comma ;
+
+:curry (vq-q) here [ swap compile:lit compile:jump ] dip ;
+~~~
+
+Arrays are important, being the data structure used for strings
+and a variety of other things. This is a very simple way to
+create them.
+
+~~~
+:a:make (...n-a) here [ dup comma &comma times ] dip ;
+:a:make/temp (...n-a) [ a:make a:temp ] gc ;
+~~~
+
+`a:reduce` will iterate over an array and value, applying a
+function to reduce the array down to a single value. For instance,
+to sum an array:
+
+    &array #0 &n:add a:reduce
+
+~~~
+:a:reduce (anq-n) &swap dip a:for-each ;
+~~~
+
+To map a function to each value in an array, I provide `a:map`.
+This modifies the original array, not a copy of it.
+
+~~~
+:a:map (aq-a)
+  swap [ fetch-next [ [ fetch over call ] sip
+                      &store sip n:inc ] times
+         drop-pair ] sip ;
+
+&a:map \s:map
+~~~
+
+The next couple of words allow for extracting portions of an
+array into a new array. The subsets will be stored in the
+temporary buffers.
+
+~~~
+:a:middle (afl-a)
+  here [ dup comma [ n:inc n:add ] dip
+         here swap copy ] dip dup &Free store s:temp ;
+
+:a:left  (an-a) #0 swap a:middle ;
+:a:right (an-a) over s:length over n:sub swap a:middle ;
+
+&a:left   \s:left   (sn-s)
+&a:right  \s:right  (sn-s)
+&a:middle \s:middle (sfl-s)
+~~~
+
+Input tokens are whitespace delimited. This presents an issue
+for strings: how to add spaces?
+
+The solution used here is to replace (via `s:map`) underscores
+with spaces. I've been doing this now for many years, and it's
+not proven to be a problem. The `sigil:'` will use the latest
+`s:rewrite` it can find, so you can redefine this to make other
+changes if you need to.
+
+~~~
+:s:rewrite (s-) [ dup $_ eq? [ drop #32 ] if ] s:map ;
+~~~
+
+`a:indices` returns an array with the locations of a value that
+matches the passed value. `a:index` returns the first location
+that matches.
+
+~~~
+{{
+  'Count var
+  :prepare  #0 &Count store ;
+  :reserve  swap #0 comma ;
+  :patch    here over n:sub n:dec over store ;
+  :cleanup  dup s:temp swap &Free store ;
+  :record   &Count fetch comma ;
+  :iterate  [ (match? over eq? ) &record if
+              &Count v:inc ] a:for-each ;
+---reveal---
+  :a:indices (av-a)
+    prepare here [ reserve iterate drop ] dip patch cleanup ;
+}}
+
+:a:index (av-n) [ a:indices #0 a:fetch ] gc ;
+&a:index \s:index/c
+~~~
+
+`a:contains?` returns a flag indicating whether or not an array
+contains a given value.
+
+~~~
+:a:contains? (an-f)
+  swap #0 swap [ swap [ over eq? ] dip or ] a:for-each nip ;
+
+&a:contains? \s:contains? (sc-f)
+~~~
+
+`a:filter` runs a quote against each value in an array. The quote
+needs to consume the value and return a single flag. If true, the
+value is added to a new array.
+
+~~~
+:a:filter (aq-)
+  [ [ over &call dip swap &comma &drop choose ] curry
+    here [ over fetch comma a:for-each ] dip
+    here over n:sub n:dec over store a:temp ] gc ;
+
+&a:filter \s:filter (sq-)
+~~~
+
+~~~
+:c:lowercase? (c-f) $a $z n:between? ;
+:c:uppercase? (c-f) $A $Z n:between? ;
+:c:to-upper   (c-c) dup c:lowercase? [ #32 n:sub ] if ;
+:c:to-lower   (c-c) dup c:uppercase? [ #32 n:add ] if ;
+:c:to-s       (c-s) '_ s:temp tuck #0 s:store ;
+
+:s:to-upper   (s-s) [ s:dup &c:to-upper s:map s:temp ] gc ;
+:s:to-lower   (s-s) [ s:dup &c:to-lower s:map s:temp ] gc ;
+~~~
+
+~~~
+{{
+  'Current var
+  :get-index &sys:buffers/loops @Current n:add ;
+  :prepare   &Current v:inc #0 get-index store ;
+  :cleanup   &Current v:dec ;
+  :inner:indexed-times
+    swap [ dup &call dip (next get-index v:inc ) ] dip n:dec
+    tuck n:-zero? &inner:indexed-times ?jump drop-pair ;
+---reveal---
+  :I (-n) get-index          fetch ;
+  :J (-n) get-index #1 n:sub fetch ;
+  :K (-n) get-index #2 n:sub fetch ;
+  :indexed-times (nq-) prepare inner:indexed-times cleanup ;
+}}
+
+:bi   (xqq-)    &sip dip call ;
+:bi*  (xyqq-)   &dip dip call ;
+:bi@  (xyq-)    dup bi* ;
+:tri  (xqqq-)   [ &sip dip sip ] dip call ;
+:tri* (xyzqqq-) [ [ swap &dip dip ] dip dip ] dip call ;
+:tri@ (xyzq-)   dup dup tri* ;
+
+:a:eq? (aa-f) &a:hash bi@ eq? ;
+&a:eq? \s:eq? (ss-f)
+
+:a:-eq? (aa-a) a:eq? not ;
+&a:-eq? \s:-eq? (ss-f)
+
+:a:chop (a-a) a:temp &v:dec sip ;
+&a:chop \s:chop (s-s)
+
+:a:behead (a-a)
+  a:chop [ [ n:inc dup n:inc swap ]
+           &a:length bi copy ] sip ;
+&a:behead \s:behead (s-s)
+
+:a:first (a-n) #0 a:fetch ;
+:a:last  (a-n) dup a:length n:dec a:fetch ;
+
+&a:first \s:first (s-c)
+&a:last  \s:last  (s-c)
+~~~
+
+The `s:trim` words remove leading, or trailing (or both)
+whitespace from a string. These aren't mirrored in the `a:`
+namespace.
+
+~~~
+:s:trim-right (s-s)
+  s:temp [ dup v:dec [ s:last #32 lteq? ] sip swap ] while
+  dup v:inc ;
+
+{{
+  'Start var
+  'End var
+  'Len var
+  :find-end dup s:length dup !Len over n:add n:inc !End n:inc ;
+  :new-size @Start over swap n:sub @Len swap n:sub ;
+---reveal---
+  :s:trim-left (s-s)
+    s:dup dup #0 s:fetch #32 eq?
+    [ dup !Start find-end
+      [ fetch-next #32 -eq? over @End -eq? and ] while
+      new-size (patch over store ) ] if ;
+}}
+
+:s:trim (s-s) s:trim-left s:trim-right ;
+~~~
+
+`n:get` reads a number from the input device.
+
+~~~
+:n:get (-n) s:get/token s:temp s:to-n ;
+~~~
+
+================================================================
+
+The block editor is an important piece of the Konilo system.
+It's how code is entered, managed, and run.
+
+~~~
+:block:buffer (-a) &sys:buffers/block ;
+
+#16 'Blocks var-n            (number_of_blocks_available)
+#0  'Block  var-n            (current_block_number)
+~~~
+
+~~~
+:e:to-line (n-a) #64 n:mul block:buffer n:add ;
+:e:line    (n-)  e:to-line #64 [ fetch-next c:put ] times drop nl ;
+
+{{
+  :sep  sp sp sp #6 [ '+----5---- s:put ] times '+--- s:put nl ;
+  :l/n  I dup #10 lt? &sp if n:put sp ;
+  :line l/n I e:line ;
+  :lines #16 &line indexed-times ;
+  :info 'sys:info d:lookup dup n:-zero?
+        [ d:address fetch call ] &drop choose ;
+---reveal---
+  :list* (-) nl #16 [ I e:line ] indexed-times ;
+  :list# (-) nl lines ;
+  :list  (-) nl sep lines sep info ;
+}}
+
+&list 'e:Display var-n
+{{
+  :reset #1024 block:buffer n:dec store ;
+  :constrain @Block #0 @Blocks n:dec n:limit !Block ;
+---reveal---
+  :set   (n-) !Block constrain ;
+  :save  (-)  @Block block:buffer block:save ;
+  :load  (-)  @Block block:buffer block:load reset ;
+  :next  (-)  &Block v:inc constrain load ;
+  :prev  (-)  &Block v:dec constrain load ;
+  :new   (-)  #32 block:buffer #1024 fill reset ;
+  :edit  (n-) set load @e:Display call ;
+  :run   (-)  reset block:buffer n:dec s:evaluate ;
+  :use   (block)  set load run ;
+  :using (first,last)  over n:sub swap use [ next run ] times ;
+}}
+
+{{
+  :handle  dup  #8 eq? [ drop #-1 allot ] &comma choose ;
+  :process dup #10 eq? [ drop #-1 ] [ handle #0 ] choose ;
+---reveal---
+  :s:get/line (-s)
+    here [ #0 comma [ c:get process ] until ] sip
+    here over n:sub n:dec over !Free swap store drop
+    here s:temp ;
+}}
+
+:e:erase/line (n-)  e:to-line #32 swap #64 fill ;
+:e:replace    (sn-) n:inc swap e:to-line over n:dec s:length copy ;
+:e:replace-at (snn-) [ &e:to-line dip n:add ] dip
+                     [ over store n:inc ] s:for-each drop ;
+
+:e:insert    (n"-)  dup e:erase/line s:get/line e:replace ;
+:e:insert-at (nn"-) s:get/line e:replace-at ;
+
+:0  ("-) #0  e:insert ;     :1  ("-) #1  e:insert ;
+:2  ("-) #2  e:insert ;     :3  ("-) #3  e:insert ;
+:4  ("-) #4  e:insert ;     :5  ("-) #5  e:insert ;
+:6  ("-) #6  e:insert ;     :7  ("-) #7  e:insert ;
+:8  ("-) #8  e:insert ;     :9  ("-) #9  e:insert ;
+:10 ("-) #10 e:insert ;     :11 ("-) #11 e:insert ;
+:12 ("-) #12 e:insert ;     :13 ("-) #13 e:insert ;
+:14 ("-) #14 e:insert ;     :15 ("-) #15 e:insert ;
+~~~
+
+~~~
+:. ("-) #62 [ c:get drop ] times ;
+~~~
+
+The basic `use` and `using` words aren't very convienient as you
+need to keep track of the exact blocks to load. `needs` allows
+you to use the first part of a block title line (typically a
+comment for code blocks) instead. It'll scan through the block
+set, running any blocks that match the provided text. E.g., to
+load a block set named "(pali)":
+
+    '(pali) needs
+
+Blocks are loaded in order from 0 to N, where N is the value in
+`Blocks`. This can be very slow if you have a large block set or
+are loading multiple sets of blocks. You may want to consider
+keeping blocks towards the low end of the block set and limiting
+`Blocks` before running this.
+
+~~~
+{{
+  'Len var
+  :buffer (-a) &sys:buffers/needs ;
+  :check  (-f) block:buffer buffer @Len compare ;
+  :setup  (s-) dup s:length !Len n:inc buffer @Len copy ;
+---reveal---
+  :needs (s-)
+    setup @Block [
+      @Blocks [ I set load check &run if ] indexed-times
+    ] dip !Block load ;
+}}
+~~~
+
+For generating an index of the blocks, `titles` is provided.
+This shows the block number and index line for any block with
+a title line.
+
+~~~
+:titles (-)
+  @Block @Blocks
+  [ I set load block:buffer fetch #32 -eq?
+    [ I n:put sp #64 block:buffer n:dec &store &s:put bi nl ] if
+  ] indexed-times !Block load ;
+~~~
+
+`sys:info` is called by the editor. It displays a status line below
+the editor output. You can write a new `sys:info`, and the the code
+will use the most recent one.
+
+~~~
+:sys:info (-)
+  '___B: s:put @Block n:put $/ c:put @Blocks n:dec n:put
+  '___S: s:put depth/data n:put $/ c:put #32 n:put
+  '___M: s:put here n:put $/ c:put #59999 n:put nl ;
+~~~
+
+================================================================
+
+The last couple of things are just to save the image and set a
+startup word. The default startup word runs the code in blocks
+1 and 2, then starts the editor on block 0.
+
+~~~
+{{
+  :process  (n-f) set load block:buffer fetch $( eq? &run if ;
+---reveal---
+  :prelude  (-)  #1 process #2 process ;
+  :startup  (-)  prelude ;
+}}
+
+:rom:save (-) #4 io ;
+
+rom:save bye
+~~~

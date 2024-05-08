@@ -23,3 +23,10 @@ Uxn byte code. Reason for this is it'd integrate better
 with Konilo. Also, I think it would allow for more fly-by
 one-off gestures. But this might end up being more
 trouble than it is worth.
+
+@2024-05-08
+@15:34 Try to get core memops C API to compile
+the memops stuff is mostly in C, with helper functions
+in LIL and Lua. At the very least, I'm going to try and
+get things to compile.
+

@@ -4,7 +4,7 @@ add_objects {
 	"lib/gestvm/uxn/uxn",
 	"lib/gestvm/uxn/uxnasm",
 	"lib/gestvm/gestlive",
-    -- "lib/gestvm/memops"
+    "lib/gestvm/memops",
 }
 
 add_cflags {

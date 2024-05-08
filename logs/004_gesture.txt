@@ -1,0 +1,25 @@
+@2024-05-07
+@19:51 Initial GestVM import
+attempting to import just the things I need from mnolth.
+@19:55 things build except for memops, uses lua
+memops does not want to build because I think I added
+some lua in there.
+
+As a matter of fact, there's also LIL in there as well,
+which shouldn't have built either. But, I realize that
+LIL is included in the sndkit distro at the moment. I'll
+leave it be for now, but it's going to be dead code in
+Orphium.
+@19:56 TODO revisit memops
+memops I think is all the code responsible for getting
+TAL code compiled down to uxn byte code. Right now it
+won't compile cuz it relies on the Lua C API.
+
+How hard will it be to remove Lua and get the functionality
+we want?
+
+In the long run, it'd be nice to use Konilo to metaprogram
+Uxn byte code. Reason for this is it'd integrate better
+with Konilo. Also, I think it would allow for more fly-by
+one-off gestures. But this might end up being more
+trouble than it is worth.

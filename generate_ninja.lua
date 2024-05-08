@@ -414,6 +414,7 @@ table.insert(build,
     {"mkrom.sh", "tools/pali", "tools/retro-unu", "ilo.blocks", "orphium"}))
 
 require("lib/sndkit/config")
+require("lib/gestvm/config")
 
 generate_ninja()
 -- generate_makefile()

@@ -1,0 +1,71 @@
+This is a work in progress hypothetical Konilo program
+that will generate a basic gesture path, the simplest
+building block in Gesture Synthesis.
+
+Here is the gesture program.
+I'll need to define some words later.
+
+This will programatically produce Tal program and then
+assample it into Uxn bytecode.
+
+'label' is a word that makes a Tal label.
+
+'vtx' is a gesture vertex in the path. It takes in
+3 values: a value, a rate multiplier (inverse duration,
+represented as a rational value N/D or two values),
+and an interpolation method (known in the Gesture lingo
+as a "behavior").
+
+'jump' is a jump instruction. In this context,
+we are telling Uxn to repeat the phrase indefinitely.
+~~~
+'mel label
+
+#0 #2 #1 #2 vtx
+#2 #2 #1 #2 vtx
+#4 #2 #1 #2 vtx
+#5 #2 #1 #2 vtx
+#7 #1 #1 #2 vtx
+
+'mel jump
+
+gcompile
+~~~
+Now onto the sound patch. The phasor signal is known
+in Gesture lingo as a "conductor", which is a clock signal
+that drives and synchronizes all the gesture synthesizers.
+
+"hold" is a sndkit operation which makes sure the phasor
+signal doesn't get overwritten. regset stores this buffer
+in an internal register.
+~~~
+'1.6 c '0 c phasor hold '0 c regset
+~~~
+This is the the gesture synthesizer node. It takes in
+a pointer position and a conductor signal.
+the "mel" label, and a starting position in compiled
+Uxn rom. In this case, the "mel" label is looked up.
+~~~
+'0 c regget 'mel uxnsym gnode
+~~~
+The gesture produces a signal intended to control pitch.
+This is based to be in the key of C and converted to
+frequency, then passed into a subtractive sawtooth.
+~~~
+'60 add mtof blsaw '0.5 c mul '800 c butlp
+~~
+Add reverb.
+~~
+bdup bdup '0.1 c '0.1 c '0.1 c verbity
+bdrop '15 c dblin mul
+dcblocker add
+~~~
+Cleanup and wavout
+~~~
+'0 c regget unhold
+
+'simple_path.wav wavout
+
+'10 computes
+
+bye

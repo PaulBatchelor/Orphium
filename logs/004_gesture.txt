@@ -30,3 +30,22 @@ the memops stuff is mostly in C, with helper functions
 in LIL and Lua. At the very least, I'm going to try and
 get things to compile.
 
+@15:42 Try to find good hello world example for gestvm
+I need to find something that showcases a gesture path,
+like a gesture controlling frequency. This will be something
+I will eventually be able to write using Konilo forth.
+
+@15:59 Work out Konilo Pseudo-code
+I seem to have a "simple path" example in the gestlings
+repo that I think I can turn into a Konilo program.
+There's a lot I have to build out for it to actually
+work, but I'm pretty sure I can imagine most of the
+program structure.
+
+@16:31 Pseudo-forth written in Unu. Next steps.
+Unu is a helpful way to articulate my thoughts, and
+since we have the retro-uno program why not.
+
+Next steps will involve implementing all the words that
+don't exist, which will include getting a working in-memory
+Tal assembler working. 

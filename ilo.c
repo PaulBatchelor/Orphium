@@ -19,7 +19,7 @@
 #include "sndkit/core.h"
 #include "sndkit/nodes/sknodes.h"
 #include "parse.h"
-
+#include "gestvm/gestvm.h"
 
 #define T ds[sp]    /* Top of Data Stack    */
 #define N ds[sp-1]  /* Next on Data Stack   */
@@ -47,6 +47,7 @@ C i[1];
 /* orphium objects */
 orph_buffer *ob = NULL;
 sk_core *core = NULL;
+gestvm_uxn *gu = NULL;
 
 V push(I v) { ds[sp + 1] = v; sp += 1; }
 I pop() { sp -= 1; return ds[sp + 1]; }
@@ -231,6 +232,10 @@ I ilo_main(I argc, C **argv) {
   ob = malloc(sizeof(orph_buffer));
   orph_buffer_init(ob);
 
+  /* set up gestvm Uxn */
+  gu = malloc(gestvm_uxn_sizeof());
+  gestvm_uxn_init(gu);
+
   blocks = (argc > 1) ? argv[1] : "ilo.blocks";
   rom    = (argc > 2) ? argv[2] : "ilo.rom";
   load_image();
@@ -240,6 +245,7 @@ I ilo_main(I argc, C **argv) {
   printf("bye\n");
   sk_core_del(core);
   free(ob);
+  free(gu);
   return 0;
 }
 

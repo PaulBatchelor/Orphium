@@ -48,4 +48,10 @@ since we have the retro-uno program why not.
 
 Next steps will involve implementing all the words that
 don't exist, which will include getting a working in-memory
-Tal assembler working. 
+Tal assembler working.
+
+@2024-05-09
+@19:42 Get an instance of GestVM inside ilo
+Just want to see it get initialized.
+@19:49 Okay that was easy, now to think about the memops
+

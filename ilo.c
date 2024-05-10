@@ -21,6 +21,14 @@
 #include "parse.h"
 #include "gestvm/gestvm.h"
 
+
+int
+uxnasm_compile(const char *input,
+			   size_t ilen,
+			   int symtab,
+			   unsigned char **output,
+			   size_t *olen);
+
 #define T ds[sp]    /* Top of Data Stack    */
 #define N ds[sp-1]  /* Next on Data Stack   */
 #define R as[rp]    /* Top of Address Stack */
@@ -150,10 +158,38 @@ void eval(sk_core *core, orph_buffer *ob)
     /* TODO: error handling. maybe a status flag? */
     fprintf(stderr, "oops");
   } else {
-    orph_parse_object(core, obj);
+    orph_parse_object(core, talbuf, obj);
   }
 
   orph_obj_del(&obj);
+}
+
+V compile_tal(void)
+{
+    const unsigned char *buf;
+    int sz;
+    int rc;
+    unsigned char *output;
+    size_t len;
+
+    printf("compiling tal code\n");
+    buf = orph_buffer_get(talbuf);
+    sz = orph_buffer_size(talbuf);
+    fwrite(buf, sz, 1, stdout);
+    fprintf(stdout, "\n");
+
+    rc = uxnasm_compile((const char *)buf, sz, 1, &output, &len);
+
+    if (rc) {
+        /* TODO: error handling */
+        fprintf(stderr, "oops uxn error\n");
+    }
+
+    printf("assembled %ld bytes\n", len);
+
+    /* copy bytes over to uxn rom */
+
+    free(output);
 }
 
 V ioi(void) {
@@ -167,7 +203,6 @@ V ioi(void) {
     case 1: {
       I b;
       b = pop() & 0xFF;
-      /* TODO: make this put work with Tal buffer */
       orph_buffer_put(ob, b);
       break;
     }
@@ -175,11 +210,14 @@ V ioi(void) {
       eval(core, ob);
       orph_buffer_reinit(ob);
       break;
-    case 3:
-      /* TODO: set up Tal */
+    case 3: /* initialize TAL buffer */
+      orph_buffer_reinit(talbuf);
+      break;
+    case 4: /* compile TAL buffer */
+      compile_tal();
       break;
     default:
-        break;
+      break;
   }
 }
 

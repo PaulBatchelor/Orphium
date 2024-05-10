@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "buffer.h"
 #include "sndkit/graforge/graforge.h"
 #include "sndkit/core.h"
 #include "sndkit/nodes/sknodes.h"
@@ -91,7 +92,19 @@ static void parse_word(sk_core *core, const char *word)
     word_lookup(core, word, NULL);
 }
 
-int orph_parse_object(sk_core *core, orph_obj *obj)
+static void append_word(const char *word, orph_buffer *talbuf)
+{
+    int len;
+    int i;
+    len = strlen(word);
+
+    for (i = 0; i < len; i++) {
+        orph_buffer_put(talbuf, word[i]);
+    }
+    orph_buffer_put(talbuf, ' ');
+}
+
+int orph_parse_object(sk_core *core, orph_buffer *talbuf, orph_obj *obj)
 {
     if (orph_obj_isstr(obj)) {
         const char *word;
@@ -135,7 +148,6 @@ int orph_parse_object(sk_core *core, orph_obj *obj)
                 } else if (!strcmp(key->val, "tal")) {
                     orph_obj_str *name;
                     is_tal = 1;
-                    is_node = 1;
                     name = m->val[i].val->data;
                     tal_word = name->val;
                 } else if (!strcmp(key->val, "data")) {
@@ -149,6 +161,7 @@ int orph_parse_object(sk_core *core, orph_obj *obj)
             word_lookup(core, node_name, node_data);
         } else if (is_tal) {
             printf("Tal word: %s\n", tal_word);
+            append_word(tal_word, talbuf);
         }
     }
     return 0;

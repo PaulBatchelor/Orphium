@@ -83,3 +83,34 @@ Ilo block storage, which could help with some of the
 space concerns.
 
 @20:08 initial TAL placeholder for orph_parse_object()
+
+@2024-05-10
+@15:11 Implement tal objects
+@15:48 do the final copy over
+I've got everything working to the point where it compiles
+the ROM. Now I just gotta copy it over properly.
+---
+Ah, this is a little bit trickier than I thought. I actually
+need to hold on to the compiled ROM because it contains
+the symbol table, stored inside a =gestvm_membuf=.
+---
+I can use =gestvm_load= for now using the membuf holder.
+When gestlive starts happening, things might need to be
+revamped. It's unclear to me how much new code I'll need
+to write out, if any, since the old code was designed
+around using LIL and Lua.
+---
+Wait. =gestvm_load= is a filepath, not the rom itself.
+Going to need to rework things.
+@16:04 TODO next steps
+Make memops =load= a public function.
+
+=compile_tal= needs to use memops =load= with a re-usable
+=gestvm_membuf= storing the ROM and symbol table. Make
+sure to free.
+
+Then, start thinking about the gesture signal generator
+nodes.
+
+Then, start thinking about sound nodes needed for hello
+world.

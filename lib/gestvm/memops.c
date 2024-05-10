@@ -10,10 +10,7 @@
 #define GESTVM_PRIV
 #include "gestvm.h"
 
-typedef struct {
-    unsigned char *buf;
-    size_t size;
-} gestvm_membuf;
+#include "memops.h"
 
 void gestvm_memops_lil(lil_t lil);
 static lil_value_t l_gmemnew(lil_t lil,
@@ -279,3 +276,5 @@ static int load(gestvm_uxn *gu, gestvm_membuf *rom)
             &pos);
     return 0;
 }
+
+

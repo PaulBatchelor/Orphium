@@ -48,6 +48,7 @@ C i[1];
 orph_buffer *ob = NULL;
 sk_core *core = NULL;
 gestvm_uxn *gu = NULL;
+orph_buffer *talbuf = NULL;
 
 V push(I v) { ds[sp + 1] = v; sp += 1; }
 I pop() { sp -= 1; return ds[sp + 1]; }
@@ -141,6 +142,8 @@ void eval(sk_core *core, orph_buffer *ob)
   bytes = orph_buffer_get(ob);
   sz = orph_buffer_size(ob);
 
+  if (sz == 0) return;
+
   rc = orph_obj_parse(bytes, sz, &obj);
 
   if (rc) {
@@ -164,11 +167,16 @@ V ioi(void) {
     case 1: {
       I b;
       b = pop() & 0xFF;
+      /* TODO: make this put work with Tal buffer */
       orph_buffer_put(ob, b);
       break;
     }
     case 2:
       eval(core, ob);
+      orph_buffer_reinit(ob);
+      break;
+    case 3:
+      /* TODO: set up Tal */
       break;
     default:
         break;
@@ -235,6 +243,8 @@ I ilo_main(I argc, C **argv) {
   /* set up gestvm Uxn */
   gu = malloc(gestvm_uxn_sizeof());
   gestvm_uxn_init(gu);
+  talbuf = malloc(sizeof(orph_buffer));
+  orph_buffer_init(talbuf);
 
   blocks = (argc > 1) ? argv[1] : "ilo.blocks";
   rom    = (argc > 2) ? argv[2] : "ilo.rom";
@@ -246,6 +256,7 @@ I ilo_main(I argc, C **argv) {
   sk_core_del(core);
   free(ob);
   free(gu);
+  free(talbuf);
   return 0;
 }
 

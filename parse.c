@@ -103,13 +103,17 @@ int orph_parse_object(sk_core *core, orph_obj *obj)
         orph_obj_map *m;
         int i;
         int is_node;
+        int is_tal;
         orph_obj *node_data;
         const char *node_name;
+        const char *tal_word;
 
         is_node = 0;
+        is_tal = 0;
         m = (orph_obj_map *)obj->data;
         node_name = NULL;
         node_data = NULL;
+        tal_word = NULL;
 
         for (i = 0; i < m->length; i++) {
             if (m->val[i].key != NULL) {
@@ -128,6 +132,12 @@ int orph_parse_object(sk_core *core, orph_obj *obj)
                     is_node = 1;
                     name = m->val[i].val->data;
                     node_name = name->val;
+                } else if (!strcmp(key->val, "tal")) {
+                    orph_obj_str *name;
+                    is_tal = 1;
+                    is_node = 1;
+                    name = m->val[i].val->data;
+                    tal_word = name->val;
                 } else if (!strcmp(key->val, "data")) {
                     node_data = m->val[i].val;
                 }
@@ -137,6 +147,8 @@ int orph_parse_object(sk_core *core, orph_obj *obj)
         if (is_node) {
             /* TODO: node_lookup vs word_lookup? */
             word_lookup(core, node_name, node_data);
+        } else if (is_tal) {
+            printf("Tal word: %s\n", tal_word);
         }
     }
     return 0;

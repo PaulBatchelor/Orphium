@@ -53,5 +53,33 @@ Tal assembler working.
 @2024-05-09
 @19:42 Get an instance of GestVM inside ilo
 Just want to see it get initialized.
-@19:49 Okay that was easy, now to think about the memops
 
+@19:49 Okay that was easy, now to think about the memops
+Here's what I'm finding:
+
+There's a pretty simple struct called =gestvm_membuf=,
+that's just char pointer with a size.
+
+I wrote a routine that compiles a tal string to an
+in-memory Uxn buffer called =uxnasm_compile= (which I
+think is a part of uxnasm.c). I believe this allocates
+a buffer internally and must be freed later.
+
+It shouldn't be too difficult to use this to build a
+single-pass Uxn compiler that generates a program once.
+We're not doing realtime hotswapping yet, so this should
+be good enough.
+
+@20:02 set up orphium buffer for Tal
+The idea will be to set up a decently sized Tal buffer
+to copy a single Tal program to. Then, I'll need to
+start working out what the msgpack protocol is going
+to look like.
+
+Note: the orph buffer is currently set to be 1024.
+Will that be big enough? I'm already thinking about
+adding I/O stuff to Uxn that would allow it to read from
+Ilo block storage, which could help with some of the
+space concerns.
+
+@20:08 initial TAL placeholder for orph_parse_object()

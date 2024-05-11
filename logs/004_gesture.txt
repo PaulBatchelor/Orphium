@@ -150,3 +150,6 @@ It works!
 @16:16 Cleanup, bring in new words
 @16:20 A better way to write core Orphium Konilo code
 I wonder if I can do things imilar to extend.konilo
+@16:50 Added '%' sigil for sndkit floats. NICE.
+Okay. I'm at a pretty good stopping point. I have
+also added my test patch to the examples folder.

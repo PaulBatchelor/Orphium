@@ -1,0 +1,20 @@
+The "hello world" of gesture synthesis.
+~~~
+orph:begin-tal
+'|0100 orph:tword
+'@hello orph:tword
+
+'#00 orph:val '#04 '#01 orph:ratemul orph:b-glissm
+'#02 orph:val
+'#04 orph:val
+'#07 orph:val
+'#0b orph:val
+'#02 '#01 orph:ratemul orph:b-glissm
+';hello orph:JMP2
+
+orph:compile
+
+%1.5 phasor 'hello orph:uxnsym gsg
+%63 add mtof %0.5 sine
+'test.wav wavout '10 computes
+bye

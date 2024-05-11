@@ -33,4 +33,8 @@ orph:begin #1 orph:fixmap 'tal orph:str orph:str orph:end ;
 :orph:BRK 'BRK orph:tword ;
 :orph:val orph:next orph:BRK ;
 :orph:uxnsym 'data 'uxnsym 'cmd orph:obj n:to-s ;
+:orph:b-glissm '#02 orph:bhvr ;
+:orph:ratemul  orph:den orph:num ;
+:sigil:% c ;
+&sigil:% $% sigil:set
 rom:save bye

@@ -20,6 +20,7 @@
 #include "sndkit/nodes/sknodes.h"
 #include "parse.h"
 #include "gestvm/gestvm.h"
+#include "gestvm/memops.h"
 
 
 int
@@ -57,6 +58,7 @@ orph_buffer *ob = NULL;
 sk_core *core = NULL;
 gestvm_uxn *gu = NULL;
 orph_buffer *talbuf = NULL;
+gestvm_membuf uxnrom;
 
 V push(I v) { ds[sp + 1] = v; sp += 1; }
 I pop() { sp -= 1; return ds[sp + 1]; }
@@ -183,13 +185,21 @@ V compile_tal(void)
     if (rc) {
         /* TODO: error handling */
         fprintf(stderr, "oops uxn error\n");
+        return;
     }
 
     printf("assembled %ld bytes\n", len);
 
-    /* copy bytes over to uxn rom */
+    if (uxnrom.buf != NULL) {
+        free(uxnrom.buf);
+        uxnrom.buf = NULL;
+        uxnrom.size = 0;
+    }
 
-    free(output);
+    uxnrom.buf = output;
+    uxnrom.size = len;
+
+    gestvm_load_mem(gu, &uxnrom);
 }
 
 V ioi(void) {
@@ -283,6 +293,8 @@ I ilo_main(I argc, C **argv) {
   gestvm_uxn_init(gu);
   talbuf = malloc(sizeof(orph_buffer));
   orph_buffer_init(talbuf);
+  uxnrom.buf = NULL;
+  uxnrom.size = 0;
 
   blocks = (argc > 1) ? argv[1] : "ilo.blocks";
   rom    = (argc > 2) ? argv[2] : "ilo.rom";

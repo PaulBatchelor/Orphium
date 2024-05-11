@@ -277,4 +277,7 @@ static int load(gestvm_uxn *gu, gestvm_membuf *rom)
     return 0;
 }
 
-
+int gestvm_load_mem(gestvm_uxn *gu, gestvm_membuf *rom)
+{
+    return load(gu, rom);
+}

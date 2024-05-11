@@ -410,7 +410,7 @@ table.insert(build,
 
 table.insert(build,
     mkbuild("ilo.rom",
-    "genrom", {"mkrom.sh", "konilo.pali", "extend.konilo"}, nil,
+    "genrom", {"mkrom.sh", "konilo.pali", "extend.konilo", "orphium.konilo"}, nil,
     {"mkrom.sh", "tools/pali", "tools/retro-unu", "ilo.blocks", "orphium"}))
 
 require("lib/sndkit/config")

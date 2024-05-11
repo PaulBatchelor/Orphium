@@ -1,0 +1,36 @@
+Core Orphium commands, to be added to the Konilo ROM.
+~~~
+:orph:io #8 io ;
+:orph:begin #0 orph:io ;
+:orph:put #1 orph:io ;
+:orph:end #2 orph:io ;
+:orph:str 
+dup a:length #5 #5 shift-left or orph:put
+[ orph:put ] s:for-each ;
+:orph:word orph:begin orph:str orph:end ;
+:orph:fixmap #8 #4 shift-left or orph:put ;
+:orph:obj
+orph:begin #2 orph:fixmap orph:str orph:str
+orph:str orph:str orph:end ;
+:c orph:word ;
+:sine 'sine orph:word ;
+:wavout 'data 'wavout 'node orph:obj ;
+:gsg 'data 'gsg 'node orph:obj ;
+:add 'add orph:word ;
+:mtof 'mtof orph:word ;
+:phasor 'phasor orph:word ;
+:computes 'data 'computes 'cmd orph:obj ;
+:orph:begin-tal #3 orph:io ;
+:orph:compile #4 orph:io ;
+:orph:tword
+orph:begin #1 orph:fixmap 'tal orph:str orph:str orph:end ;
+:orph:DEO swap orph:tword orph:tword 'DEO orph:tword ;
+:orph:num '#24 orph:DEO ;
+:orph:den '#25 orph:DEO ;
+:orph:bhvr '#27 orph:DEO ;
+:orph:next '#26 orph:DEO ;
+:orph:JMP2 orph:tword 'JMP2 orph:tword ;
+:orph:BRK 'BRK orph:tword ;
+:orph:val orph:next orph:BRK ;
+:orph:uxnsym 'data 'uxnsym 'cmd orph:obj n:to-s ;
+rom:save bye

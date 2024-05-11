@@ -1,0 +1,14 @@
+(orphium) (orph:)
+:orph:begin-tal #3 orph:io ;
+:orph:compile #4 orph:io ;
+:orph:tword
+orph:begin #1 orph:fixmap 'tal orph:str orph:str orph:end ;
+:orph:DEO swap orph:tword orph:tword 'DEO orph:tword ;
+:orph:num '#24 orph:DEO ;
+:orph:den '#25 orph:DEO ;
+:orph:bhvr '#27 orph:DEO ;
+:orph:next '#26 orph:DEO ;
+:orph:JMP2 orph:tword 'JMP2 orph:tword ;
+:orph:BRK 'BRK orph:tword ;
+:orph:val orph:next orph:BRK ;
+:orph:uxnsym 'data 'uxnsym 'cmd orph:obj n:to-s ;

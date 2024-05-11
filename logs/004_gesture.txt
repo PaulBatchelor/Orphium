@@ -146,3 +146,7 @@ to get moved out of there.
 that's a little sloppy. I will need to separate them later.
 @16:08 motf, add
 @16:10 render to wav, see if there's sound
+It works!
+@16:16 Cleanup, bring in new words
+@16:20 A better way to write core Orphium Konilo code
+I wonder if I can do things imilar to extend.konilo

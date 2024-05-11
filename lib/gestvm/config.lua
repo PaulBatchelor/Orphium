@@ -1,6 +1,7 @@
 add_objects {
     "lib/gestvm/gestvm",
-	-- "lib/gestvm/l_gestvm",
+    -- l_gestvm has sk_node_gestvm
+    "lib/gestvm/l_gestvm",
 	"lib/gestvm/uxn/uxn",
 	"lib/gestvm/uxn/uxnasm",
 	"lib/gestvm/gestlive",

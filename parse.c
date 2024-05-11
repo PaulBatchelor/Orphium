@@ -8,6 +8,13 @@
 #include "sndkit/nodes/sknodes.h"
 #include "obj.h"
 #include "parse.h"
+#include "gestvm/gestvm.h"
+#include "gestvm/memops.h"
+
+void ilo_push(int val);
+gestvm_membuf * uxnrom_get(void);
+gestvm_uxn *gestvm_get(void);
+int sk_node_gestvm(sk_core *core, unsigned int ptr);
 
 static void n_wavout(sk_core *core, orph_obj *data)
 {
@@ -31,6 +38,42 @@ static void n_sine(sk_core *core, orph_obj *data)
 {
     printf("sine\n");
     sk_node_sine(core);
+}
+
+static void n_phasor(sk_core *core, orph_obj *data)
+{
+    printf("phasor\n");
+    sk_node_phasor(core, 0);
+}
+
+static void n_mtof(sk_core *core, orph_obj *data)
+{
+    printf("mtof\n");
+    sk_node_mtof(core);
+}
+
+static void n_add(sk_core *core, orph_obj *data)
+{
+    printf("add\n");
+    sk_node_add(core);
+}
+
+static void n_gsg(sk_core *core, orph_obj *data)
+{
+    gestvm_uxn *gu;
+    orph_obj_str *str;
+    const char *saddr;
+    int addr;
+    printf("gsg\n");
+
+    str = data->data;
+    saddr = str->val;
+    addr = atoi(saddr);
+
+    gu = gestvm_get();
+    sk_core_generic_push(core, gu);
+    sk_core_swap(core);
+    sk_node_gestvm(core, addr);
 }
 
 static void computes(sk_core *core, orph_obj *data)
@@ -63,6 +106,23 @@ static void mkparam(sk_core *core, const char *str)
     sk_core_constant(core, param);
 }
 
+static void uxn_symbol_lookup(orph_obj *obj)
+{
+    const char *sym;
+    orph_obj_str *os;
+    gestvm_membuf *rom;
+    unsigned int addr;
+
+    os = (orph_obj_str *)obj->data;
+    sym = (const char *)os->val;
+    printf("uxn symbol: %s\n", sym);
+
+    rom = uxnrom_get();
+    addr = gestvm_lookup_mem(rom, sym);
+
+    ilo_push(addr);
+}
+
 static void word_lookup(sk_core *core, const char *node_name, orph_obj *node_data)
 {
     /* TODO: replace with more robust dictionary */
@@ -75,8 +135,19 @@ static void word_lookup(sk_core *core, const char *node_name, orph_obj *node_dat
         computes(core, node_data);
     } else if (!strcmp(node_name, "hello")) {
         printf("hello orphium!\n");
+    } else if (!strcmp(node_name, "uxnsym")) {
+        uxn_symbol_lookup(node_data);
+    } else if (!strcmp(node_name, "phasor")) {
+        n_phasor(core, node_data);
+    } else if (!strcmp(node_name, "gsg")) {
+        n_gsg(core, node_data);
+    } else if (!strcmp(node_name, "mtof")) {
+        n_mtof(core, node_data);
+    } else if (!strcmp(node_name, "add")) {
+        n_add(core, node_data);
     } else {
         /* TODO: error handling */
+        printf("could not find word: %s\n", node_name);
     }
 }
 

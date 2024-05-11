@@ -140,6 +140,12 @@ static unsigned int lookup(gestvm_membuf *rom, const char *sym)
 
     return addr;
 }
+
+unsigned int gestvm_lookup_mem(gestvm_membuf *rom, const char *sym)
+{
+    return lookup(rom, sym);
+}
+
 static lil_value_t l_gmemsym(lil_t lil,
         size_t argc,
         lil_value_t *argv)

@@ -7,4 +7,5 @@ typedef struct {
 } gestvm_membuf;
 
 int gestvm_load_mem(gestvm_uxn *gu, gestvm_membuf *rom);
+unsigned int gestvm_lookup_mem(gestvm_membuf *rom, const char *sym);
 #endif

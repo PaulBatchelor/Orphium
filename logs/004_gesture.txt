@@ -120,3 +120,29 @@ world.
 @14:40 Attempting to make memops load public function
 Calling it =gestvm_load_mem=.
 @14:43 Load rom using =gestvm_load_mem=.
+@15:11 Implement symbol lookup
+This takes in a symbol string, then gets a location.
+Should be able to look up the current ROM symbol table.
+@15:37 Sine hello world scaffolding
+Bare minimum nodes. Will implement everything later.
+@15:48 GSG and Phasor nodes
+Phasor: no sweat.  GSG: how are we making this node again?
+Gotta look it up.
+---
+=sk_node_gestvm=, which takes in an address pointer as
+an arg.
+
+Data I am passing in is a string, so we could do symbol
+look up here, but I am committed to the idea of eventually
+making anonymous path programs that can be made inline
+with the patch. Plus, we have already got the symbol
+lookup working already.
+---
+Ah, we're going to need to push the gestvm instance.
+ilo.c is getting croweded. Eventually stuff we'll need
+to get moved out of there.
+---
+=sk_node_gestvm= is bundled in with the LIL nodes. Well,
+that's a little sloppy. I will need to separate them later.
+@16:08 motf, add
+@16:10 render to wav, see if there's sound

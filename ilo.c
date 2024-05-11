@@ -202,6 +202,21 @@ V compile_tal(void)
     gestvm_load_mem(gu, &uxnrom);
 }
 
+gestvm_membuf * uxnrom_get(void)
+{
+    return &uxnrom;
+}
+
+gestvm_uxn *gestvm_get(void)
+{
+    return gu;
+}
+
+V ilo_push(int val)
+{
+    push(val);
+}
+
 V ioi(void) {
   I cmd;
   cmd = pop();
